@@ -4,6 +4,7 @@ let repoNameEl = document.querySelector("#repo-name");
 
 let getRepoIssues = function(repo) {
     let apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
+    //make a get request to url
     fetch(apiUrl).then(function(response) {
         //request was successful
         if (response.ok) {
@@ -16,7 +17,8 @@ let getRepoIssues = function(repo) {
                 }
             });
         } else {
-            alert("There was a problem with your request!");
+            //if request is unsuccessful, redirect to homepage
+            document.location.replace("./index.html");
         }
     });
     
@@ -24,12 +26,19 @@ let getRepoIssues = function(repo) {
 
 
 let getRepoName = function() {
+    //get repo name from url query string
     let queryString = document.location.search;
     let repoName = queryString.split("=")[1];
-    getRepoIssues(repoName);
-    repoNameEl.textContent = repoName;
-};
 
+    if (repoName) {
+        getRepoIssues(repoName);
+        repoNameEl.textContent = repoName;
+    } else {
+        //if no repo is given, redirect to the homepage
+        document.location.replace("./index.html");
+    }
+    
+};
 
 
 let displayIssues = function(issues) {
@@ -83,7 +92,5 @@ let displayWarning = function(repo) {
     //append to warning container
     limitWarningEl.appendChild(linkEl);
 };
-
-//getRepoIssues();
 
 getRepoName();
