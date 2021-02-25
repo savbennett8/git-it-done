@@ -1,4 +1,5 @@
 let issueContainerEl = document.querySelector("#issues-container");
+let limitWarningEl = document.querySelector("#limit-warning");
 
 let getRepoIssues = function(repo) {
     let apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
@@ -7,15 +8,20 @@ let getRepoIssues = function(repo) {
         if (response.ok) {
             response.json().then(function(data) {
                 displayIssues(data);
+
+                //check if api has paginated issues
+                if (response.headers.get("Link")) {
+                    displayWarning(repo);
+                }
             });
         } else {
             alert("There was a problem with your request!");
         }
-    })
+    });
     
 };
 
-getRepoIssues("savbennett8/run-buddy");
+getRepoIssues("angular/angular");
 
 let displayIssues = function(issues) {
     if (issues.length === 0) {
@@ -23,7 +29,7 @@ let displayIssues = function(issues) {
         return;
     }
 
-    for (var i = 0; i < displayIssues.length; i++) {
+    for (var i = 0; i < issues.length; i++) {
         //create a link element to take users to the issue on github
         var issueEl = document.createElement("a");
         issueEl.classList = "list-item flex-row justify-space-between align-center";
@@ -54,3 +60,17 @@ let displayIssues = function(issues) {
         issueContainerEl.appendChild(issueEl);
     }
 }
+
+let displayWarning = function(repo) {
+    //add text to warning container
+    limitWarningEl.textContent = "To see more than 30 issues, visit ";
+    
+    //create link element to github
+    let linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    //append to warning container
+    limitWarningEl.appendChild(linkEl);
+};
